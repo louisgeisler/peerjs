@@ -39,8 +39,20 @@ export class Socket extends EventEmitter {
 			return;
 		}
 
-		this._socket = new WebSocket(wsUrl + "&version=" + version);
+		const wsUrlVersion = wsUrl + "&version=" + version;
+
+		try {
+			this._socket = new WebSocket(wsUrl + "&version=" + version);
+		} catch (e) {
+			logger.log(`WebSocket not supported or invalid URL.`, e);
+			return;
+		}
 		this._disconnected = false;
+
+		this._socket.onerror = (error) => {
+			logger.log(`WebSocket not supported or invalid URL.`, error);
+			return;
+		}
 
 		this._socket.onmessage = (event) => {
 			let data;
